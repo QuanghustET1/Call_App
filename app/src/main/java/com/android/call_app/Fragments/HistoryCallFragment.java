@@ -1,9 +1,11 @@
 package com.android.call_app.Fragments;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,11 +28,13 @@ import java.util.ArrayList;
 public class HistoryCallFragment extends Fragment {
     private RecyclerView historyCall;
     private DatabaseReference dataHistoryCall;
+    private TextView noItemHis;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_history_call, container, false);
         this.historyCall = view.findViewById(R.id.historyCall);
+        noItemHis = view.findViewById(R.id.noItemHis);
         return view;
     }
 
@@ -53,12 +57,18 @@ public class HistoryCallFragment extends Fragment {
                         dataHistory.add(dataItem);
                     }
                 }
+                for(HistoryCall historyCall : dataHistory){
+                    Log.d("hisitem", historyCall.getCall_ID());
+                }
+                if(dataHistory.size() == 0){
+                    noItemHis.setText("History Call is Empty");
+                }
                 HistoryCallFragment.this.historyCall.setAdapter(new historyItemCallAdapter(dataHistory));
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
+                Log.d("errr", error.getMessage());
             }
         });
     }

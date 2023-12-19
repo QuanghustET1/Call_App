@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentStatePagerAdapter;
 
 import com.android.call_app.Fragments.CallFragment;
 import com.android.call_app.Fragments.HistoryCallFragment;
+import com.android.call_app.Fragments.ChatFragment;
+import com.android.call_app.Fragments.SettingFragment;
 
 public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public ViewPagerAdapter(@NonNull FragmentManager fm, int behavior) {
@@ -22,6 +24,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 return new CallFragment();
             case 1:
                 return new HistoryCallFragment();
+            case 2:
+                return new ChatFragment();
+            case 3:
+                return new SettingFragment();
             default:
                 return new CallFragment();
         }
@@ -29,7 +35,7 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
 
     @Override
     public int getCount() {
-        return 2;
+        return 4;
     }
 
     @Nullable
@@ -40,6 +46,10 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
                 return "Call";
             case 1:
                 return "History Call";
+            case 2:
+                return "Chat";
+            case 3:
+                return "Setting";
         }
         return "";
     }

@@ -1,6 +1,7 @@
 package com.android.call_app.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.FragmentStatePagerAdapter;
 import androidx.viewpager.widget.ViewPager;
 
@@ -13,6 +14,7 @@ import com.android.call_app.Adapters.ViewPagerAdapter;
 import com.android.call_app.Db.User;
 import com.android.call_app.R;
 import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.auth.FirebaseAuth;
 import com.zegocloud.uikit.prebuilt.call.config.ZegoNotificationConfig;
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationConfig;
 import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationService;
@@ -20,34 +22,43 @@ import com.zegocloud.uikit.prebuilt.call.invite.ZegoUIKitPrebuiltCallInvitationS
 public class MainActivity extends AppCompatActivity {
     private TabLayout mTablayout;
     private ViewPager mViewPager;
-    private static User userSession;
+    private static String userSession;
+    private FirebaseAuth firebaseAuth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        this.userSession = (User) getIntent().getSerializableExtra("userSession");
+        this.firebaseAuth = FirebaseAuth.getInstance();
+        checkStateLogin();
         initView();
         setView();
-//        initService(MainActivity.userSession.getUsernameID());
     }
 
-//    private void initService(String userID) {
-//        Application application = getApplication(); // Android's application context
-//        long appID = 1978147676;   // yourAppID
-//        String appSign = "3bfc8708af97aaa44b2ca0d80f0d0bfce91436aa3c39bfb774bb1738a37001de";  // yourAppSign
-//        String userName = userID;
-//
-//        ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
-//        callInvitationConfig.notifyWhenAppRunningInBackgroundOrQuit = true;
-//        ZegoNotificationConfig notificationConfig = new ZegoNotificationConfig();
-//        notificationConfig.sound = "zego_uikit_sound_call";
-//        notificationConfig.channelID = "CallInvitation";
-//        notificationConfig.channelName = "CallInvitation";
-//        ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
-//    }
+
+    private void initService(String userID) {
+        Application application = getApplication();
+        long appID = 1690058828;
+        String appSign = "839c6f2bb708e909243df09697830d91cba34d62712efd83ef93b34b845391ae";
+        String userName = userID;
+
+        ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();
+
+        ZegoUIKitPrebuiltCallInvitationService.init(getApplication(), appID, appSign, userID, userName,callInvitationConfig);
+    }
+    private void checkStateLogin() {
+        if(firebaseAuth.getCurrentUser() == null){
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
+        }
+        else {
+            userSession = firebaseAuth.getCurrentUser().getEmail().split("@")[0];
+            initService(userSession);
+        }
+    }
+
 
     public static String getUserID(){
-        return userSession.getUsernameID();
+        return userSession;
     }
 
     private void setView() {
