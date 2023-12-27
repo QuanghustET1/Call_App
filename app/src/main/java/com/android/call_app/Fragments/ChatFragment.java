@@ -15,6 +15,7 @@ import android.widget.CompoundButton;
 import android.widget.Switch;
 import android.widget.TextView;
 
+import com.android.call_app.Adapters.AllUserInSystemAdapter;
 import com.android.call_app.Adapters.listContactUserAdapter;
 import com.android.call_app.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -31,15 +32,15 @@ public class ChatFragment extends Fragment {
     private DatabaseReference dbAllUserSystem;
     private FirebaseAuth firebaseAuth;
     private RecyclerView listUserContactView;
+    private RecyclerView listUserSystem;
     private TextView noItem;
-    private Switch isAllUsers;
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chat, container, false);
         listUserContactView = view.findViewById(R.id.listUserContactView);
         noItem = view.findViewById(R.id.noItem);
-        isAllUsers = view.findViewById(R.id.isAllUsers);
+        listUserSystem = view.findViewById(R.id.listUserSystem);
         return view;
     }
 
@@ -50,146 +51,56 @@ public class ChatFragment extends Fragment {
         this.dbAllUserSystem = FirebaseDatabase.getInstance().getReference("dataUser");
         this.firebaseAuth = FirebaseAuth.getInstance();
         getListUserContact();
-        userSystemBtnListener();
+        getAllUserSystem();
     }
 
-    private void userSystemBtnListener() {
+    private void getAllUserSystem() {
+        this.dbAllUserSystem.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<String> listUserSystem = new ArrayList<>();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    String user = dataSnapshot.getKey().split("_")[0];
+                    listUserSystem.add(user);
+                }
+                ChatFragment.this.listUserSystem.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.HORIZONTAL, false));
+                ChatFragment.this.listUserSystem.setAdapter(new AllUserInSystemAdapter(listUserSystem, getContext()));
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
     }
+
 
     private void getListUserContact() {
         String username = firebaseAuth.getCurrentUser().getEmail().split("@")[0];
-        if(this.isAllUsers.isChecked() == true){
-            try {
-                final int[] lengthListUser = {0};
-                dbAllUserSystem.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        ArrayList<String> listUserContact = new ArrayList<>();
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            listUserContact.add(dataSnapshot.getKey().split("_")[0]);
-                        }
-                        if(listUserContact.size() != lengthListUser[0]){
-                            noItem.setText("");
-                            ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                            ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
-                            lengthListUser[0] = listUserContact.size();
-                        }
-                        if(lengthListUser[0] == 0){
-                            noItem.setText("Users Contact are Empty");
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
-            catch (Exception e){
-
-            }
-        }
-        else {
-            try {
-                DatabaseReference dataSnapshotUser = dbListUserContact.child("room_"+username);
-                final int[] lengthListUser = {0};
-                dataSnapshotUser.addValueEventListener(new ValueEventListener() {
-                    @Override
-                    public void onDataChange(@NonNull DataSnapshot snapshot) {
-                        ArrayList<String> listUserContact = new ArrayList<>();
-                        for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                            listUserContact.add(dataSnapshot.getKey());
-                        }
-                        ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                        ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
-                        if(listUserContact.size() != lengthListUser[0]){
-                            ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                            ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
-                            lengthListUser[0] = listUserContact.size();
-                        }
-                        if(lengthListUser[0] == 0){
-                            noItem.setText("Users Contact are Empty");
-                        }
-                    }
-
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-
-                    }
-                });
-            }
-            catch (Exception e){
-
-            }
-        }
-        this.isAllUsers.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+        DatabaseReference dataSnapshotUser = dbListUserContact.child("room_"+username);
+        final int[] lengthListUser = {0};
+        dataSnapshotUser.addValueEventListener(new ValueEventListener() {
             @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
-                if(b == true){
-                    try {
-                        final int[] lengthListUser = {0};
-                        dbAllUserSystem.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                ArrayList<String> listUserContact = new ArrayList<>();
-                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                    listUserContact.add(dataSnapshot.getKey().split("_")[0]);
-                                }
-                                if(listUserContact.size() != lengthListUser[0]){
-                                    noItem.setText("");
-                                    ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                    ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
-                                    lengthListUser[0] = listUserContact.size();
-                                }
-                                if(lengthListUser[0] == 0){
-                                    noItem.setText("Users Contact are Empty");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-                    catch (Exception e){
-
-                    }
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                ArrayList<String> listUserContact = new ArrayList<>();
+                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
+                    listUserContact.add(dataSnapshot.getKey());
                 }
-                else {
-                    try {
-                        DatabaseReference dataSnapshotUser = dbListUserContact.child("room_"+username);
-                        final int[] lengthListUser = {0};
-                        dataSnapshotUser.addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                ArrayList<String> listUserContact = new ArrayList<>();
-                                for(DataSnapshot dataSnapshot : snapshot.getChildren()){
-                                    listUserContact.add(dataSnapshot.getKey());
-                                }
-                                ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
-                                if(listUserContact.size() != lengthListUser[0]){
-                                    ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
-                                    ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
-                                    lengthListUser[0] = listUserContact.size();
-                                }
-                                if(lengthListUser[0] == 0){
-                                    noItem.setText("Users Contact are Empty");
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-
-                            }
-                        });
-                    }
-                    catch (Exception e){
-
-                    }
+                ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
+                if(listUserContact.size() != lengthListUser[0]){
+                    ChatFragment.this.listUserContactView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+                    ChatFragment.this.listUserContactView.setAdapter(new listContactUserAdapter(listUserContact, getContext()));
+                    lengthListUser[0] = listUserContact.size();
                 }
+                if(lengthListUser[0] == 0){
+                    noItem.setText("Users Contact are Empty");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
             }
         });
     }

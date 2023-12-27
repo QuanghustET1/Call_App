@@ -37,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void initService(String userID) {
         Application application = getApplication();
-        long appID = 1690058828;
-        String appSign = "839c6f2bb708e909243df09697830d91cba34d62712efd83ef93b34b845391ae";
+        long appID = 1861364857;
+        String appSign = "befd8c52935e1bffd7a3c323f6df61a35b76779348c10312bacdfa9f0a0148a8";
         String userName = userID;
 
         ZegoUIKitPrebuiltCallInvitationConfig callInvitationConfig = new ZegoUIKitPrebuiltCallInvitationConfig();

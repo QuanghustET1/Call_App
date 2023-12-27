@@ -21,15 +21,15 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position){
             case 0:
-                return new CallFragment();
-            case 1:
-                return new HistoryCallFragment();
-            case 2:
                 return new ChatFragment();
+            case 1:
+                return new CallFragment();
+            case 2:
+                return new HistoryCallFragment();
             case 3:
                 return new SettingFragment();
             default:
-                return new CallFragment();
+                return new ChatFragment();
         }
     }
 
@@ -43,11 +43,11 @@ public class ViewPagerAdapter extends FragmentStatePagerAdapter {
     public CharSequence getPageTitle(int position) {
         switch (position){
             case 0:
-                return "Call";
-            case 1:
-                return "History Call";
-            case 2:
                 return "Chat";
+            case 1:
+                return "Call";
+            case 2:
+                return "History Call";
             case 3:
                 return "Setting";
         }
